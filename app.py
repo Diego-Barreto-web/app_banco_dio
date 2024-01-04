@@ -23,19 +23,20 @@ os.system('cls')
 print('SEJA BEM VINDO!')
 while True:
 
-    opcao = input(menu).lower()
+    opcao = input(menu).casefold()
 
     if opcao == "d":
         os.system('cls')
         while True:
             try:
                 valor = float(input('Qual valor deseja depositar? '))
+                valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
                 if valor > 0:
                     os.system('cls')
-                    print(f'Depósito de R$ {valor:.2f} realizado!')
+                    print(f'Depósito de R$ {valor_ajustado} realizado!')
                     depositos.append(valor)
                     saldo+=valor
-                    valor_alinhado = "R$"+f"{valor:.2f}".rjust(10)
+                    valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
                     extrato+=f"{valor_alinhado}\n"
                     break
                 else: 
@@ -51,6 +52,7 @@ while True:
         while True:
             try:
                 valor = float(input('Qual valor deseja sacar? '))
+                valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
                 if valor > saldo:
                     os.system('cls')
                     print('Operação falhou! Saldo insuficiente!')
@@ -66,11 +68,11 @@ while True:
                 else:
                     if valor > 0:
                         os.system('cls')
-                        print(f'Saque de R$ {valor:.2f} realizado!')
+                        print(f'Saque de R$ {valor_ajustado} realizado!')
                         saques.append(-valor)
                         saldo-=valor
                         numero_saques+=1
-                        valor_alinhado = "R$"+f"-{valor:.2f}".rjust(10)
+                        valor_alinhado = "R$"+f"-{valor_ajustado}".rjust(10)
                         extrato+=f"{valor_alinhado}\n"
                         break
                     else: 
@@ -82,7 +84,8 @@ while True:
 
     elif opcao == "e":
         os.system('cls')
-        saldo_alinhado = "R$"+f"{saldo:.2f}".rjust(10)
+        saldo_ajustado = '{:_.2f}'.format(saldo).replace('.', ',').replace('_', '.')
+        saldo_alinhado = "R$"+f"{saldo_ajustado}".rjust(10)
         if extrato == """---EXTRATO---
 """:
             print('Não foram realizadas movimentações!')
