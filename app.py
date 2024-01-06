@@ -89,6 +89,35 @@ def criar_conta_corrente(cpf):
         return True
     else:
         return False
+    
+def saque_deposito(operacao, num):
+    os.system('cls')
+    while True:
+        try:
+            if num == 1:
+                valor = float(input('Qual valor deseja depositar? '))
+            elif num == 2:
+                valor = float(input('Qual valor deseja sacar? '))
+            valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
+            if valor > 0:
+                os.system('cls')
+                print(f'Depósito de R$ {valor_ajustado} realizado!')
+                contas.get(conta)[0][operacao].append(valor)
+                if num == 1:
+                    contas.get(conta)[0]['saldo'] += valor
+                    valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
+                elif num == 2: 
+                    contas.get(conta)[0]['saldo'] -= valor
+                    valor_alinhado = "R$"+f"-{valor_ajustado}".rjust(10)
+                contas.get(conta)[0]['extrato']+=f"{valor_alinhado}\n"
+                break
+            else: 
+                os.system('cls')
+                print('Operação falhou! O valor deve ser maior que zero!')
+        except ValueError:
+            os.system('cls')
+            print('Operação falhou! Por favor, insira um valor válido.')
+
 
 
 while True:
@@ -97,6 +126,7 @@ while True:
 [1] Cadastrar Usuário
 [2] Criar Conta Corrente
 [3] Entrar na Conta
+[4] Sair
 ------------------------    """)
     opcao = int(input())
 
@@ -115,7 +145,7 @@ while True:
         criar_conta_usuario = input('informe o cpf: ')
         criar_conta_corrente(criar_conta_usuario)
         if criar_conta_corrente(criar_conta_usuario) == True:
-            contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': [], 'saldo': 0}]
+            contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0}]
             os.system('cls')
             print('Conta criada com sucesso!')
             i+=1
@@ -135,34 +165,31 @@ while True:
 [3] Extrato                      
 [4] Sair
 ------------------------    """)
-                print(contas.get(conta)[0]['depositos'])
                 opcao = int(input())
                 if opcao == 1:
                     os.system('cls')
-                    while True:
-                        try:
-                            valor = float(input('Qual valor deseja depositar? '))
-                            valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
-                            if valor > 0:
-                                os.system('cls')
-                                print(f'Depósito de R$ {valor_ajustado} realizado!')
-                                contas.get(conta)[0]['depositos'].append(valor)
-                                contas.get(conta)[0]['saldo'] += valor
-                                valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
-                                print(contas[conta])
-                                break
-                            else: 
-                                os.system('cls')
-                                print('Operação falhou! O valor deve ser maior que zero!')
-                        except ValueError:
-                            os.system('cls')
-                            print('Operação falhou! Por favor, insira um valor válido.')
-
-
+                    saque_deposito('depositos', opcao)
+                elif opcao == 2:
+                    os.system('cls')
+                    saque_deposito('saques', opcao)
+                elif opcao == 3:
+                    os.system('cls')
+                    print('----------EXTRATO----------')
+                    print(contas.get(conta)[0]['extrato'])
+                    print('-----------SALDO-----------')
+                    print("R$"+f"{contas.get(conta)[0]['saldo']}\n".rjust(10))
+                if opcao == 4:
+                    os.system('cls')
+                    break
         else:
             print('Conta não cadastrada!')
-    else: 
+    elif opcao == 4:
+        os.system('cls')
         break
+    else: 
+        os.system('cls')
+        print('Opção inválida!')
+        continue
 print('Finalizou')
 
 
