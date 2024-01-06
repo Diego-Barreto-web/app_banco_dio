@@ -90,7 +90,7 @@ def criar_conta_corrente(cpf):
     else:
         return False
     
-def saque_deposito(operacao, num):
+def saque_deposito(operacao, num, l):
     os.system('cls')
     while True:
         try:
@@ -98,17 +98,31 @@ def saque_deposito(operacao, num):
                 valor = float(input('Qual valor deseja depositar? '))
             elif num == 2:
                 valor = float(input('Qual valor deseja sacar? '))
+                if contas.get(conta)[0][l] >= contas.get(conta)[0]['limite diario']:
+                    os.system('cls')
+                    print('Limite de saques excedido!')
+                    break
+                elif valor > contas.get(conta)[0]['limite saque']:
+                    os.system('cls')
+                    print('Seu limite de saque é de R${:,.2f}'.format(contas.get(conta)[0]['limite saque']))
+                    break
+                if valor > contas.get(conta)[0]['saldo']:
+                    os.system('cls')
+                    print('Saldo insuficiente!')
+                    break
             valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
             if valor > 0:
                 os.system('cls')
-                print(f'Depósito de R$ {valor_ajustado} realizado!')
                 contas.get(conta)[0][operacao].append(valor)
                 if num == 1:
+                    print(f'Depósito de R$ {valor_ajustado} realizado!')
                     contas.get(conta)[0]['saldo'] += valor
                     valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
                 elif num == 2: 
+                    print(f'Saque de R$ {valor_ajustado} realizado!')
                     contas.get(conta)[0]['saldo'] -= valor
                     valor_alinhado = "R$"+f"-{valor_ajustado}".rjust(10)
+                    contas.get(conta)[0][l] += 1
                 contas.get(conta)[0]['extrato']+=f"{valor_alinhado}\n"
                 break
             else: 
@@ -117,6 +131,16 @@ def saque_deposito(operacao, num):
         except ValueError:
             os.system('cls')
             print('Operação falhou! Por favor, insira um valor válido.')
+
+def verificar_existencia_conta(i):
+    if(criar_conta_usuario not in contas):
+        contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3,'limite usado': 0, 'limite saque': 500}]
+        os.system('cls')
+        print('Conta criada com sucesso!')
+    else: 
+        contas[criar_conta_usuario].append({'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3, 'limite usado': 0, 'limite saque': 500})
+        os.system('cls')
+        print('Conta criada com sucesso!')
 
 
 
@@ -145,10 +169,10 @@ while True:
         criar_conta_usuario = input('informe o cpf: ')
         criar_conta_corrente(criar_conta_usuario)
         if criar_conta_corrente(criar_conta_usuario) == True:
-            contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0}]
-            os.system('cls')
-            print('Conta criada com sucesso!')
+            verificar_existencia_conta(i)
             i+=1
+            print(contas)
+            input()
         else:
             print('Usuário não existente!')
             print(criar_conta_usuario)
@@ -157,8 +181,16 @@ while True:
         # contas.get(conta)
         conta = input('Informe o cpf da conta que deseja entrar: ')
         if conta in contas:
+            indice_usuario = lista_cpf.index(conta)
+            print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome']))
+            if len(contas.get(conta)) > 1: 
+                n = 1
+                for i in range (len(contas.get(conta))):
+                    print('[{}] - Saldo: {}'.format(n, contas.get(conta)[i]['saldo']))
+                    n+=1
+                numero_da_conta = input('Selecione a conta: ')
+            print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]['número']))
             while True:
-                print('SEJA BEM VINDO!')
                 print("""------------------------
 [1] Depositar
 [2] Sacar
@@ -168,10 +200,10 @@ while True:
                 opcao = int(input())
                 if opcao == 1:
                     os.system('cls')
-                    saque_deposito('depositos', opcao)
+                    saque_deposito('depositos', opcao, 'limite usado')
                 elif opcao == 2:
                     os.system('cls')
-                    saque_deposito('saques', opcao)
+                    saque_deposito('saques', opcao, 'limite usado')
                 elif opcao == 3:
                     os.system('cls')
                     print('----------EXTRATO----------')
