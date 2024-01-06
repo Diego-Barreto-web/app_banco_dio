@@ -96,6 +96,7 @@ while True:
     print("""------------------------
 [1] Cadastrar Usuário
 [2] Criar Conta Corrente
+[3] Entrar na Conta
 ------------------------    """)
     opcao = int(input())
 
@@ -114,7 +115,7 @@ while True:
         criar_conta_usuario = input('informe o cpf: ')
         criar_conta_corrente(criar_conta_usuario)
         if criar_conta_corrente(criar_conta_usuario) == True:
-            contas[criar_conta_usuario] = [{'agencia': '0001', 'número': i}]
+            contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': [], 'saldo': 0}]
             os.system('cls')
             print('Conta criada com sucesso!')
             i+=1
@@ -122,6 +123,44 @@ while True:
             print('Usuário não existente!')
             print(criar_conta_usuario)
             continue
+    elif opcao == 3:
+        # contas.get(conta)
+        conta = input('Informe o cpf da conta que deseja entrar: ')
+        if conta in contas:
+            while True:
+                print('SEJA BEM VINDO!')
+                print("""------------------------
+[1] Depositar
+[2] Sacar
+[3] Extrato                      
+[4] Sair
+------------------------    """)
+                print(contas.get(conta)[0]['depositos'])
+                opcao = int(input())
+                if opcao == 1:
+                    os.system('cls')
+                    while True:
+                        try:
+                            valor = float(input('Qual valor deseja depositar? '))
+                            valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
+                            if valor > 0:
+                                os.system('cls')
+                                print(f'Depósito de R$ {valor_ajustado} realizado!')
+                                contas.get(conta)[0]['depositos'].append(valor)
+                                contas.get(conta)[0]['saldo'] += valor
+                                valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
+                                print(contas[conta])
+                                break
+                            else: 
+                                os.system('cls')
+                                print('Operação falhou! O valor deve ser maior que zero!')
+                        except ValueError:
+                            os.system('cls')
+                            print('Operação falhou! Por favor, insira um valor válido.')
+
+
+        else:
+            print('Conta não cadastrada!')
     else: 
         break
 print('Finalizou')
@@ -154,25 +193,25 @@ print('Finalizou')
 #     opcao = input(menu).casefold()
 
 #     if opcao == "d":
-#         os.system('cls')
-#         while True:
-#             try:
-#                 valor = float(input('Qual valor deseja depositar? '))
-#                 valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
-#                 if valor > 0:
-#                     os.system('cls')
-#                     print(f'Depósito de R$ {valor_ajustado} realizado!')
-#                     depositos.append(valor)
-#                     saldo+=valor
-#                     valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
-#                     extrato+=f"{valor_alinhado}\n"
-#                     break
-#                 else: 
-#                     os.system('cls')
-#                     print('Operação falhou! O valor deve ser maior que zero!')
-#             except ValueError:
-#                 os.system('cls')
-#                 print('Operação falhou! Por favor, insira um valor válido.')
+        # os.system('cls')
+        # while True:
+        #     try:
+        #         valor = float(input('Qual valor deseja depositar? '))
+        #         valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
+        #         if valor > 0:
+        #             os.system('cls')
+        #             print(f'Depósito de R$ {valor_ajustado} realizado!')
+        #             depositos.append(valor)
+        #             saldo+=valor
+        #             valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
+        #             extrato+=f"{valor_alinhado}\n"
+        #             break
+        #         else: 
+        #             os.system('cls')
+        #             print('Operação falhou! O valor deve ser maior que zero!')
+        #     except ValueError:
+        #         os.system('cls')
+        #         print('Operação falhou! Por favor, insira um valor válido.')
                 
     
 #     elif opcao == "s":
