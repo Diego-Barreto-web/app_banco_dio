@@ -98,32 +98,32 @@ def saque_deposito(operacao, num, l):
                 valor = float(input('Qual valor deseja depositar? '))
             elif num == 2:
                 valor = float(input('Qual valor deseja sacar? '))
-                if contas.get(conta)[0][l] >= contas.get(conta)[0]['limite diario']:
+                if contas.get(conta)[int(numero_da_conta)-1][l] >= contas.get(conta)[int(numero_da_conta)-1]['limite diario']:
                     os.system('cls')
                     print('Limite de saques excedido!')
                     break
-                elif valor > contas.get(conta)[0]['limite saque']:
+                elif valor > contas.get(conta)[int(numero_da_conta)-1]['limite saque']:
                     os.system('cls')
-                    print('Seu limite de saque é de R${:,.2f}'.format(contas.get(conta)[0]['limite saque']))
+                    print('Seu limite de saque é de R${:,.2f}'.format(contas.get(conta)[int(numero_da_conta)-1]['limite saque']))
                     break
-                if valor > contas.get(conta)[0]['saldo']:
+                if valor > contas.get(conta)[int(numero_da_conta)-1]['saldo']:
                     os.system('cls')
                     print('Saldo insuficiente!')
                     break
             valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
             if valor > 0:
                 os.system('cls')
-                contas.get(conta)[0][operacao].append(valor)
+                contas.get(conta)[int(numero_da_conta)-1][operacao].append(valor)
                 if num == 1:
                     print(f'Depósito de R$ {valor_ajustado} realizado!')
-                    contas.get(conta)[0]['saldo'] += valor
+                    contas.get(conta)[int(numero_da_conta)-1]['saldo'] += valor
                     valor_alinhado = "R$"+f"{valor_ajustado}".rjust(10)
                 elif num == 2: 
                     print(f'Saque de R$ {valor_ajustado} realizado!')
-                    contas.get(conta)[0]['saldo'] -= valor
+                    contas.get(conta)[int(numero_da_conta)-1]['saldo'] -= valor
                     valor_alinhado = "R$"+f"-{valor_ajustado}".rjust(10)
-                    contas.get(conta)[0][l] += 1
-                contas.get(conta)[0]['extrato']+=f"{valor_alinhado}\n"
+                    contas.get(conta)[int(numero_da_conta)-1][l] += 1
+                contas.get(conta)[int(numero_da_conta)-1]['extrato']+=f"{valor_alinhado}\n"
                 break
             else: 
                 os.system('cls')
@@ -150,7 +150,9 @@ while True:
 [1] Cadastrar Usuário
 [2] Criar Conta Corrente
 [3] Entrar na Conta
-[4] Sair
+[4] Excluir Usuário
+[5] Excluir Conta
+[6] Sair
 ------------------------    """)
     opcao = int(input())
 
@@ -179,17 +181,20 @@ while True:
             continue
     elif opcao == 3:
         # contas.get(conta)
+        os.system('cls')
         conta = input('Informe o cpf da conta que deseja entrar: ')
         if conta in contas:
             indice_usuario = lista_cpf.index(conta)
             print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome']))
             if len(contas.get(conta)) > 1: 
                 n = 1
-                for i in range (len(contas.get(conta))):
-                    print('[{}] - Saldo: {}'.format(n, contas.get(conta)[i]['saldo']))
+                for cont in range (len(contas.get(conta))):
+                    print('[{}] - Saldo: {}'.format(n, contas.get(conta)[cont]['saldo']))
                     n+=1
                 numero_da_conta = input('Selecione a conta: ')
-            print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]['número']))
+            os.system('cls')
+            print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
+            print(contas.get(conta)[int(numero_da_conta)-1])
             while True:
                 print("""------------------------
 [1] Depositar
@@ -207,15 +212,15 @@ while True:
                 elif opcao == 3:
                     os.system('cls')
                     print('----------EXTRATO----------')
-                    print(contas.get(conta)[0]['extrato'])
+                    print(contas.get(conta)[int(numero_da_conta)-1]['extrato'])
                     print('-----------SALDO-----------')
-                    print("R$"+f"{contas.get(conta)[0]['saldo']}\n".rjust(10))
+                    print("R$"+f"{contas.get(conta)[int(numero_da_conta)-1]['saldo']}\n".rjust(10))
                 if opcao == 4:
                     os.system('cls')
                     break
         else:
             print('Conta não cadastrada!')
-    elif opcao == 4:
+    elif opcao == 6:
         os.system('cls')
         break
     else: 
