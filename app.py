@@ -59,29 +59,43 @@ def cadastrar_usuario(cpfs_users):
 
     os.system('cls')
     cpf = input('Informe o CPF (pode conter a ponutação): ')
-    cpf = verifica_cpf(cpf)
-    cpfs_users = cpf
-
-
-    os.system('cls')
-    logradouro = input('Informe o logradouro: ')
-    logradouro = verifica_ncebl(logradouro)
-
-    numero = input('Informe o número da casa: ')
-
-    bairro = input('Informe o bairro: ')
-    bairro = verifica_ncebl(bairro)
-
-    cidade = input('Informe a cidade: ')
-    cidade = verifica_ncebl(cidade)
-
-    estado = input('Informe o estado: ')
-    estado = verifica_ncebl(estado)
-    os.system('cls')
-
-    endereço_completo = '{}, {} - {} - {} {}'.format(logradouro, numero, bairro, cidade, estado)
+    while True:
+        if cpf in lista_cpf[:]:
+            os.system('cls')
+            print('CPF já cadastrado!')
+            if deseja_continuar() == True:
+                cpf = input('Informe o CPF (pode conter a ponutação): ')
+                continue
+            else: 
+                cpf = '0'
+                break
+        else:
+            cpf = verifica_cpf(cpf)
+            cpfs_users = cpf
+            break
     
-    return {'nome': nome, 'data_de_nascimento': data_de_nascimento, 'cpf': cpf, 'logradouro': logradouro, 'numero': numero, 'bairro': bairro, 'cidade': cidade, 'estado': estado, 'endereço_completo': endereço_completo}, cpfs_users
+    if cpf != '0':
+        os.system('cls')
+        logradouro = input('Informe o logradouro: ')
+        logradouro = verifica_ncebl(logradouro)
+
+        numero = input('Informe o número da casa: ')
+
+        bairro = input('Informe o bairro: ')
+        bairro = verifica_ncebl(bairro)
+
+        cidade = input('Informe a cidade: ')
+        cidade = verifica_ncebl(cidade)
+
+        estado = input('Informe o estado: ')
+        estado = verifica_ncebl(estado)
+        os.system('cls')
+
+        endereço_completo = '{}, {} - {} - {} {}'.format(logradouro, numero, bairro, cidade, estado)
+        return {'nome': nome, 'data_de_nascimento': data_de_nascimento, 'cpf': cpf, 'logradouro': logradouro, 'numero': numero, 'bairro': bairro, 'cidade': cidade, 'estado': estado, 'endereço_completo': endereço_completo}, True, cpfs_users
+    else: 
+        return {'nome': nome, 'data_de_nascimento': data_de_nascimento, 'cpf': cpf}, False, cpfs_users
+
 
 def criar_conta_corrente(cpf):
     if cpf in lista_cpf[:]:
@@ -91,7 +105,7 @@ def criar_conta_corrente(cpf):
         return False
     
 def excluir_conta_corrente():
-    pass
+    del contas.get(conta)[int(numero_da_conta)-1]
     
 def saque_deposito(operacao, num, l):
     os.system('cls')
@@ -148,6 +162,12 @@ def verificar_existencia_conta(i):
         os.system('cls')
         print('Conta criada com sucesso!')
 
+def excluir_usuario(usuario):
+    indice = lista_cpf.index(usuario)
+    usuarios.pop(indice)
+    lista_cpf.pop(indice)
+    del contas[usuario]
+
 def listar_contas():
     indice_usuario = lista_cpf.index(conta)
     print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome'])) 
@@ -157,7 +177,6 @@ def listar_contas():
         n+=1
 
 def deseja_continuar():
-    os.system('cls') 
     while True:
         print("""Deseja continuar?
               
@@ -191,15 +210,21 @@ while True:
         # criar usuario
         os.system('cls')
         usuario = [cadastrar_usuario(lista_cpf)]
-        print('Usuário criado com sucesso!')
-        continue
+        if usuario[0][1] == False :
+            os.system('cls')
+            print('Usuário não cadastrado!\nEsse CPF já havia sido cadastrado!')
+        else: 
+            usuarios += usuario[0][:-2]
+            lista_cpf.append(usuario[0][-1])
+            print('Usuário criado com sucesso!')
+            print(usuario[0][-1])
+            print(usuarios)
     elif opcao == 2:
         # criar conta corrente
         os.system('cls')
-        lista_cpf.append(usuario[0][-1])
-        usuarios += usuario[0][:-1]
 
         criar_conta_usuario = input('informe o cpf: ')
+        criar_conta_usuario = verifica_cpf(criar_conta_usuario)
         criar_conta_corrente(criar_conta_usuario)
         if criar_conta_corrente(criar_conta_usuario) == True:
             verificar_existencia_conta(i)
@@ -214,6 +239,7 @@ while True:
         # contas.get(conta)
         os.system('cls')
         conta = input('Informe o cpf da conta que deseja entrar: ')
+        conta = verifica_cpf(conta)
         if conta in contas:
             listar_contas()
             numero_da_conta = input('Selecione a conta: ')
@@ -258,15 +284,26 @@ while True:
                     break
         else:
             print('Conta não cadastrada!')
+    elif opcao == 4:
+        usuario = input('Informe o cpf do usuário que deseja excluir: ')
+        usuario = verifica_cpf(usuario)
+        if usuario in lista_cpf:
+            os.system('cls')
+            excluir_usuario(usuario)
+        else:
+            os.system('cls')
+            print('Usuário não cadastrado!')
+
     elif opcao == 5:
         conta = input('Informe o cpf da conta que deseja entrar: ')
+        conta = verifica_cpf(conta)
         if conta in contas:
             listar_contas()
             numero_da_conta = input('Selecione a conta que deseja excluir: ')
             os.system('cls')
             print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
             print(f'Conta de número {contas.get(conta)[int(numero_da_conta)-1]["número"]} excluida!')
-            del contas.get(conta)[int(numero_da_conta)-1]
+            excluir_conta_corrente()
         else:
             print('Conta não cadastrada!')
     elif opcao == 6:
