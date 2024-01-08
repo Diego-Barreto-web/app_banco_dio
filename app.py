@@ -90,6 +90,9 @@ def criar_conta_corrente(cpf):
     else:
         return False
     
+def excluir_conta_corrente():
+    pass
+    
 def saque_deposito(operacao, num, l):
     os.system('cls')
     while True:
@@ -132,6 +135,9 @@ def saque_deposito(operacao, num, l):
             os.system('cls')
             print('Operação falhou! Por favor, insira um valor válido.')
 
+def trasnferencia():
+    pass
+
 def verificar_existencia_conta(i):
     if(criar_conta_usuario not in contas):
         contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3,'limite usado': 0, 'limite saque': 500}]
@@ -141,6 +147,31 @@ def verificar_existencia_conta(i):
         contas[criar_conta_usuario].append({'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3, 'limite usado': 0, 'limite saque': 500})
         os.system('cls')
         print('Conta criada com sucesso!')
+
+def listar_contas():
+    indice_usuario = lista_cpf.index(conta)
+    print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome'])) 
+    n = 1
+    for cont in range (len(contas.get(conta))):
+        print('[{}] - Saldo: {}'.format(n, contas.get(conta)[cont]['saldo']))
+        n+=1
+
+def deseja_continuar():
+    os.system('cls') 
+    while True:
+        print("""Deseja continuar?
+              
+[1] Continuar
+[2] Voltar""")
+        d_continuar = int(input())
+        try: 
+            if d_continuar == 1:
+                return True
+            elif d_continuar == 2:
+                return False
+        except ValueError:
+            os.system('cls')
+            print('Informe a opção corretamente!')
 
 
 
@@ -184,14 +215,8 @@ while True:
         os.system('cls')
         conta = input('Informe o cpf da conta que deseja entrar: ')
         if conta in contas:
-            indice_usuario = lista_cpf.index(conta)
-            print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome']))
-            if len(contas.get(conta)) > 1: 
-                n = 1
-                for cont in range (len(contas.get(conta))):
-                    print('[{}] - Saldo: {}'.format(n, contas.get(conta)[cont]['saldo']))
-                    n+=1
-                numero_da_conta = input('Selecione a conta: ')
+            listar_contas()
+            numero_da_conta = input('Selecione a conta: ')
             os.system('cls')
             print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
             print(contas.get(conta)[int(numero_da_conta)-1])
@@ -199,25 +224,49 @@ while True:
                 print("""------------------------
 [1] Depositar
 [2] Sacar
-[3] Extrato                      
-[4] Sair
+[3] Transferir
+[4] Extrato                      
+[5] Sair
 ------------------------    """)
                 opcao = int(input())
                 if opcao == 1:
                     os.system('cls')
-                    saque_deposito('depositos', opcao, 'limite usado')
+                    if deseja_continuar() == True:
+                        os.system('cls')
+                        saque_deposito('depositos', opcao, 'limite usado')
+                    else: 
+                        os.system('cls')
+                        print('O depósito não foi realizado!')
                 elif opcao == 2:
                     os.system('cls')
-                    saque_deposito('saques', opcao, 'limite usado')
+                    if deseja_continuar() == True:
+                        os.system('cls')
+                        saque_deposito('saques', opcao, 'limite usado')
+                    else:
+                        os.system('cls')
+                        print('O saque não foi realizado')
                 elif opcao == 3:
+                    pass
+                elif opcao == 4:
                     os.system('cls')
                     print('----------EXTRATO----------')
                     print(contas.get(conta)[int(numero_da_conta)-1]['extrato'])
                     print('-----------SALDO-----------')
                     print("R$"+f"{contas.get(conta)[int(numero_da_conta)-1]['saldo']}\n".rjust(10))
-                if opcao == 4:
+                if opcao == 5:
                     os.system('cls')
                     break
+        else:
+            print('Conta não cadastrada!')
+    elif opcao == 5:
+        conta = input('Informe o cpf da conta que deseja entrar: ')
+        if conta in contas:
+            listar_contas()
+            numero_da_conta = input('Selecione a conta que deseja excluir: ')
+            os.system('cls')
+            print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
+            print(f'Conta de número {contas.get(conta)[int(numero_da_conta)-1]["número"]} excluida!')
+            del contas.get(conta)[int(numero_da_conta)-1]
         else:
             print('Conta não cadastrada!')
     elif opcao == 6:
