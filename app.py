@@ -43,7 +43,7 @@ def verifica_numero(verifica):
             verifica = input('Informe o dia corretamente: ')
             continue
     return verifica
-
+    
 def cadastrar_usuario(cpfs_users):
     nome = input('Informe seu nome: ')
     nome = verifica_ncebl(nome)
@@ -106,6 +106,48 @@ def criar_conta_corrente(cpf):
     
 def excluir_conta_corrente():
     del contas.get(conta)[int(numero_da_conta)-1]
+
+def menu_conta():
+    while True:
+        print("""------------------------
+[1] Depositar
+[2] Sacar
+[3] Transferir
+[4] Extrato                      
+[5] Sair
+------------------------    """)
+        opcao = int(input())
+        if opcao == 1:
+            os.system('cls')
+            print('Opção depósito escolhida.')
+            if deseja_continuar() == True:
+                os.system('cls')
+                saque_deposito('depositos', opcao, 'limite usado')
+            else: 
+                os.system('cls')
+                print('O depósito não foi realizado!')
+        elif opcao == 2:
+            os.system('cls')
+            print('Opção saque escolhida.')
+            if deseja_continuar() == True:
+                os.system('cls')
+                saque_deposito('saques', opcao, 'limite usado')
+            else:
+                os.system('cls')
+                print('O saque não foi realizado')
+        elif opcao == 3:
+            transferencia()
+        elif opcao == 4:
+            os.system('cls')
+            print('----------EXTRATO----------')
+            print(contas.get(conta)[int(numero_da_conta)-1]['extrato'])
+            print('-----------SALDO-----------')
+            print("R$"+f"{contas.get(conta)[int(numero_da_conta)-1]['saldo']}\n".rjust(10))
+        elif opcao == 5:
+            os.system('cls')
+            break
+        else:
+            print('Conta não cadastrada!')
     
 def saque_deposito(operacao, num, l):
     os.system('cls')
@@ -149,16 +191,39 @@ def saque_deposito(operacao, num, l):
             os.system('cls')
             print('Operação falhou! Por favor, insira um valor válido.')
 
-def trasnferencia():
-    pass
+def transferencia():
+    os.system('cls')
+    valor = float(input('Informe o valor que deseja transferir: '))
+    if valor > 0:
+        if valor <= contas.get(conta)[int(numero_da_conta)-1]['saldo']:
+            valor_ajustado = '{:_.2f}'.format(valor).replace('.', ',').replace('_', '.')
+            conta_beneficente = input('Informe o CPF da conta que receberá o dinheiro: ')
+            conta_beneficente = verifica_cpf(conta_beneficente)
+            if conta_beneficente in lista_cpf[:]:
+                listar_contas_transferir(conta_beneficente)
+                conta_transferencia = int(input())
+                contas.get(conta)[int(numero_da_conta)-1]['saldo'] -= valor
+                contas.get(conta)[int(numero_da_conta)-1]['transferências'].append(valor_ajustado)
+                valor_alinhado = "R$"+f"-{valor_ajustado}*".rjust(10)
+                contas.get(conta)[int(numero_da_conta)-1]['extrato']+=f"{valor_alinhado}\n"
+
+                contas.get(conta_beneficente)[int(conta_transferencia)-1]['saldo'] += valor
+                contas.get(conta_beneficente)[int(conta_transferencia)-1]['depositos'].append(valor_ajustado)
+                valor_alinhado = "R$"+f"-{valor_ajustado}*".rjust(10)
+                contas.get(conta_beneficente)[int(conta_transferencia)-1]['extrato']+=f"{valor_alinhado}\n"
+            else:
+                print('Conta inexistente!')
+    else: 
+        print('Operação não concluida! Saldo insuficiente!')
+
 
 def verificar_existencia_conta(i):
     if(criar_conta_usuario not in contas):
-        contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3,'limite usado': 0, 'limite saque': 500}]
+        contas[criar_conta_usuario] = [{'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'transferências': [], 'extrato': '', 'saldo': 0, 'limite diario': 3,'limite usado': 0, 'limite saque': 500}]
         os.system('cls')
         print('Conta criada com sucesso!')
     else: 
-        contas[criar_conta_usuario].append({'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'extrato': '', 'saldo': 0, 'limite diario': 3, 'limite usado': 0, 'limite saque': 500})
+        contas[criar_conta_usuario].append({'número': i, 'agencia': '0001', 'saques': [], 'depositos': [], 'transferências': [], 'extrato': '', 'saldo': 0, 'limite diario': 3, 'limite usado': 0, 'limite saque': 500})
         os.system('cls')
         print('Conta criada com sucesso!')
 
@@ -168,9 +233,17 @@ def excluir_usuario(usuario):
     lista_cpf.pop(indice)
     del contas[usuario]
 
-def listar_contas():
+def listar_contas(conta):
     indice_usuario = lista_cpf.index(conta)
     print('Seja bem vindo, {}!'.format(usuarios[indice_usuario]['nome'])) 
+    n = 1
+    for cont in range (len(contas.get(conta))):
+        print('[{}] - Saldo: {}'.format(n, contas.get(conta)[cont]['saldo']))
+        n+=1
+
+def listar_contas_transferir(conta):
+    indice_usuario = lista_cpf.index(conta)
+    print('Informe a conta de, {} que receberá a transferência!'.format(usuarios[indice_usuario]['nome'])) 
     n = 1
     for cont in range (len(contas.get(conta))):
         print('[{}] - Saldo: {}'.format(n, contas.get(conta)[cont]['saldo']))
@@ -241,49 +314,13 @@ while True:
         conta = input('Informe o cpf da conta que deseja entrar: ')
         conta = verifica_cpf(conta)
         if conta in contas:
-            listar_contas()
+            listar_contas(conta)
             numero_da_conta = input('Selecione a conta: ')
             os.system('cls')
             print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
             print(contas.get(conta)[int(numero_da_conta)-1])
-            while True:
-                print("""------------------------
-[1] Depositar
-[2] Sacar
-[3] Transferir
-[4] Extrato                      
-[5] Sair
-------------------------    """)
-                opcao = int(input())
-                if opcao == 1:
-                    os.system('cls')
-                    if deseja_continuar() == True:
-                        os.system('cls')
-                        saque_deposito('depositos', opcao, 'limite usado')
-                    else: 
-                        os.system('cls')
-                        print('O depósito não foi realizado!')
-                elif opcao == 2:
-                    os.system('cls')
-                    if deseja_continuar() == True:
-                        os.system('cls')
-                        saque_deposito('saques', opcao, 'limite usado')
-                    else:
-                        os.system('cls')
-                        print('O saque não foi realizado')
-                elif opcao == 3:
-                    pass
-                elif opcao == 4:
-                    os.system('cls')
-                    print('----------EXTRATO----------')
-                    print(contas.get(conta)[int(numero_da_conta)-1]['extrato'])
-                    print('-----------SALDO-----------')
-                    print("R$"+f"{contas.get(conta)[int(numero_da_conta)-1]['saldo']}\n".rjust(10))
-                if opcao == 5:
-                    os.system('cls')
-                    break
-        else:
-            print('Conta não cadastrada!')
+            menu_conta()  
+
     elif opcao == 4:
         usuario = input('Informe o cpf do usuário que deseja excluir: ')
         usuario = verifica_cpf(usuario)
@@ -298,7 +335,7 @@ while True:
         conta = input('Informe o cpf da conta que deseja entrar: ')
         conta = verifica_cpf(conta)
         if conta in contas:
-            listar_contas()
+            listar_contas(conta)
             numero_da_conta = input('Selecione a conta que deseja excluir: ')
             os.system('cls')
             print('Número da conta: {}'.format(contas.get(conta)[int(numero_da_conta)-1]))
