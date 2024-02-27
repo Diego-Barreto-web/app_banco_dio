@@ -96,7 +96,6 @@ def cadastrar_usuario(cpfs_users):
     else: 
         return {'nome': nome, 'data_de_nascimento': data_de_nascimento, 'cpf': cpf}, False, cpfs_users
 
-
 def criar_conta_corrente(cpf):
     if cpf in lista_cpf[:]:
         # indice_usuario = lista_cpf.index(cpf)
